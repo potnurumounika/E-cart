@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .cart {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.4) 100%);
+            box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .cart-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: auto;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .total {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #fff;
+            color: #3498db;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            color: #fff;
+        }
+    </style>
+<style type="text/css" id="operaUserStyle"></style></head>
+<body>
+
+<div class="container">
+    <div class="cart" id="cart"></div>
+    <div class="total" id="total">Total: ₹0</div>
+    <button onclick="checkout()">Checkout</button>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", updateCart);
+    function removeItem(item) {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const updatedCart = cart.filter(cartItem => cartItem.name !== item.name);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        updateCart();
+    }
+    function clearCart() {
+        localStorage.removeItem("cart");
+        updateCart();
+    }
+    function checkout() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (cart.length === 0) {
+        alert("Your cart is empty. Add items before checking out.");
+    } else {
+        const orders = JSON.parse(localStorage.getItem("orders")) || [];
+        localStorage.setItem("orders", JSON.stringify([...orders, { items: cart, timestamp: new Date() }]));
+        localStorage.removeItem("cart");
+
+        alert("Your order placed successfully!");
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 1000);
+    }
+}
+    function updateCart() {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const cartContainer = document.getElementById("cart");
+        const totalContainer = document.getElementById("total");
+        let total = 0;
+        cartContainer.innerHTML = "";
+        cart.forEach(item => {
+            const { name, price } = item;
+            const imageSrc = getImagePathForCart(name);
+            total += price;
+            const cartItem = document.createElement("div");
+            cartItem.classList.add("cart-item");
+            const itemImage = document.createElement("img");
+            itemImage.src = imageSrc;
+            itemImage.alt = ${name} Image;
+            const itemDetails = document.createElement("div");
+            itemDetails.innerHTML = '<strong>${name}</strong><br>Price: ₹${price}';
+            const removeButton = document.createElement("button");
+            removeButton.textContent = "Remove";
+            removeButton.onclick = () => removeItem(item);
+            cartItem.appendChild(itemImage);
+            cartItem.appendChild(itemDetails);
+            cartItem.appendChild(removeButton);
+            cartContainer.appendChild(cartItem);
+        });
+        totalContainer.textContent = 'Total: ₹${total}';
+    }
+    function getImagePathForCart(productName) {
+        switch (productName) {
+            case "Rolex Watch":
+                return "watch.jpg";
+            case "Spectacles":
+                return "specs.jpeg";
+            case "A|X Wallet":
+                return "wallet.jpg";
+            default:
+                return "";
+        }
+    }
+</script>
+
+
+</body></html>
